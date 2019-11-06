@@ -34,26 +34,19 @@ int** initialize_lattice(int n)
 int random_position(int n)
 {
   int random_pos;
-// picks out random x and y position in the lattice
   random_pos = rand()%n;
   return random_pos;
 }
 
-bool corner(n,m,size)
-{
-  bool variable;
-  if ((m = 0 && n = 0) || (m = size && n = 0 ) || (m = 0 && n = size ) || (m = size && n = size){
-    variable = true;
-  } else{
-    variable = false;
-  }
-  return variable;
-}
 
-//boolean edge(n,m,size)
+
+//double energy(int** lattice, int n,int m, int size)
 //{
-//  bool variable;
-
+//  double E;
+//  if (corner(n, m, size) = true){
+//    E =
+//
+//  }
 //}
 
 
