@@ -14,10 +14,10 @@ int** initialize_lattice(int n)
   int** lattice2D = 0;
   lattice2D = new int*[n];
 
-  for(int i = 0; i <= n; i++)
+  for(int i = 0; i < n; i++)
   {
     lattice2D[i] = new int[n];
-    for(int j = 0; j <= n; j++)
+    for(int j = 0; j < n; j++)
     {
       random_number = (rand()%10);
       if ( random_number < 5){
@@ -38,6 +38,16 @@ int random_position(int n)
   return random_pos;
 }
 
+void my_magnetization(int size, int& magnetization, int **myLattice)
+{
+  for(int i = 0; i < size; i++)
+  {
+    for(int j = 0; j < size; j++)
+    {
+      magnetization += myLattice[i][j];
+    }
+  }
+}
 
 
 //double energy(int** lattice, int n,int m, int size)
@@ -55,6 +65,7 @@ int main(){
   int z;
   int n = 4;
   int** myLattice;
+  int magnetization = 0;
 
   myLattice = initialize_lattice(n);
   printf("Array contents: \n ");
@@ -71,6 +82,12 @@ int main(){
   printf("random positions: \n ");
   printf("x-position: %i,",x);
   printf("\n y-position: %i",y);
+  printf("\n");
+
+//  int magnetize;
+  my_magnetization(n, magnetization, myLattice);
+  printf("Magnetization: %i,",magnetization);
+  printf("\n");
 
 
 
