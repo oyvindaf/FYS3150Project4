@@ -80,7 +80,7 @@ int main(){
   x = random_position(n);
   y = random_position(n);
   printf("random positions: \n ");
-  printf("x-position: %i,",x);
+  printf("x-position: %i",x);
   printf("\n y-position: %i",y);
   printf("\n");
 
