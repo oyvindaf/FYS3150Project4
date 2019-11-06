@@ -86,7 +86,7 @@ int main(){
 
 //  int magnetize;
   my_magnetization(n, magnetization, myLattice);
-  printf("Magnetization: %i,",magnetization);
+  printf("Magnetization: %i",magnetization);
   printf("\n");
 
 
