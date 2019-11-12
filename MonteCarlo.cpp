@@ -89,9 +89,9 @@ void Output(int size, int cycles, double temp, double* average) {
 	double Mabs_avg = average[4] * norm;
 
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
-	ofile << setw(15) << setprecision(8) << temp;
-	ofile << setw(15) << setprecision(8) << E_avg/size/size;
-	ofile << setw(15) << setprecision(8) << M_avg/size/size;
+	ofile << setprecision(8) << "T = " << temp;
+	ofile << setw(8) << setprecision(8) << "|E| = " << E_avg/size/size;
+	ofile << setw(8) << setprecision(8) << "|M| = " << M_avg/size/size;
 }
 
 
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]){
   
   ofile.open(outfilename);
 
-  n = 2; montecarlo = 10000; temp = 1;
+  n = 2; montecarlo = 1000000; temp = 1;
 
   myLattice = initialize_lattice(n);
 
