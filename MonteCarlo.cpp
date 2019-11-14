@@ -94,13 +94,22 @@ void Output(int size, int cycles, double temp, double* average) {
 	ofile << setw(8) << setprecision(8) << "|M| = " << M_avg/size/size;
 }
 
+void read_input(int& n, int& montecarlo, double& temp) {
+	cout << "number of lattices: ";
+	cin >> n;
+	cout << "number of montecarlo cycles: ";
+	cin >> montecarlo;
+	cout << "initial temperature: ";
+	cin >> temp;
+}
+
 
 int main(int argc, char* argv[]){
   srand(time(NULL)); // set random seed by using current time
   char* outfilename;
   int **myLattice, n, montecarlo;
   long idum;
-  double w[17], average[5], E, M, temp;
+  double w[17], average[5], E, M, init_temp, final_temp, temp_step;
 
   if (argc <= 1) { 
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
@@ -112,7 +121,7 @@ int main(int argc, char* argv[]){
   
   ofile.open(outfilename);
 
-  n = 2; montecarlo = 1000000; temp = 1;
+  read_input(n, montecarlo, init_temp);
 
   myLattice = initialize_lattice(n);
 
@@ -120,7 +129,7 @@ int main(int argc, char* argv[]){
   idum = -1;
   // setting up array for possible energy changes
   for (int de = -8; de <= 8; de++) w[de+8] = 0;
-  for (int de = -8; de <= 8; de += 4) w[de+8] = exp(-de / temp);
+  for (int de = -8; de <= 8; de += 4) w[de+8] = exp(-de / init_temp);
   // initializing array for expectation values
   for (int i = 0; i < 5; i++) average[i] = 0;
 
@@ -134,7 +143,7 @@ int main(int argc, char* argv[]){
 	  average[2] += M; average[3] += M*M; average[4] += fabs(M);
   }
   //Generating output data
-  Output(n, montecarlo, temp, average);
+  Output(n, montecarlo, init_temp, average);
   ofile.close();
 
   return 0;
