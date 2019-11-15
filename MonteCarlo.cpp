@@ -11,6 +11,7 @@
 
 using namespace std;
 ofstream ofile;
+void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted);
 // function for periodic boundary condition
 inline int periodic(int pos, int size, int add) {
 	return (pos + size + add) % (size);
@@ -82,31 +83,50 @@ void initialize(int size, double& M, double& E, int** myLattice) {
 	}
 }
 
-void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, double *w, int& accepted) {
+void Metropolis(int size, int montecarlo, int **myLattice, double *w, double T) {
 	random_device rd;
 	mt19937_64 gen(rd());
 	uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
 	uniform_int_distribution<int> RandomPosition(0, size-1);
 	//looping over all spins
+
+
+double accepted = 0;
+double E = 0;
+double E2 = 0;
+double M = 0;
+double M2 = 0;
+double absM = 0;
+double average[5];
+for (int i = 0; i < 5; i++) average[i] = 0;
+
+for(int cycles = 1; cycles <= montecarlo; cycles++){
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			//finding random position
-			int ix =(int) (RandomPosition(gen));
-			int iy = (int)(RandomPosition(gen));
+			int ix =(int) RandomPosition(gen);
+			int iy = (int)RandomPosition(gen);
 			int DeltaE = 2 * myLattice[iy][ix] *
 			(myLattice[iy][periodic(ix, size, -1)] + myLattice[periodic(iy, size, -1)][ix] +
 			myLattice[iy][periodic(ix, size, 1)] + myLattice[periodic(iy, size, 1)][ix]);
+			double R = RandomNumberGenerator(gen);
 
-			double R =  RandomNumberGenerator(gen);
 			if (R <= w[DeltaE + 8]) {
 				myLattice[iy][ix] *= -1;
-				cout << R << "..." <<  w[DeltaE + 8] << "..." << DeltaE << endl;
 				M += (double) 2 * myLattice[iy][ix];
 				E += (double) DeltaE;
 				accepted += 1;
 			}
+			average[0] = E/cycles/size/size;
+			average[1] = E2/cycles/size/size;
+			average[2] = M/cycles/size/size;
+			average[3] = M2/cycles/size/size;
+			average[4] = absM/cycles/size/size;
+
+			Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
 		}
 	}
+}
 }
 
 void Output(int size, int cycles, double temp, double* average) {
@@ -123,7 +143,7 @@ void Output(int size, int cycles, double temp, double* average) {
 	ofile << setw(8) << setprecision(8) << "|M| = " << M_avg/size/size;
 }
 
-void Loop_Output(int size, int cycles, double temp, double* average, int time_step, int accepted) {
+void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted) {
 	double norm = 1 / ((double)(cycles));
 	double E_avg = average[0] * norm;
 	double E2_avg = average[1] * norm;
@@ -176,18 +196,20 @@ int main(int argc, char* argv[]){
   for (int de = -8; de <= 8; de++) w[de+8] = 0;
   for (int de = -8; de <= 8; de += 4) w[de+8] = exp(-de / init_temp);
   // initializing array for expectation values
-  for (int i = 0; i < 5; i++) average[i] = 0;
+
 
   //  initializing magnetization and energy;
   initialize(n, M, E, myLattice);
-
+	Metropolis(n, montecarlo, myLattice, w, init_temp);
   // starting the montecarlo cycle
-  for (int cycle = 1; cycle <= montecarlo; cycle++) {
+	/*
+  for (int cycle = 0; cycle <= montecarlo; cycle++) {
 	  Metropolis(n, idum, myLattice, E, M, w, accepted);
 	  average[0] += E; average[1] += E*E;
 	  average[2] += M; average[3] += M*M; average[4] += fabs(M);
 		Loop_Output(n, montecarlo, init_temp, average, cycle, accepted);
   }
+	*/
   //Generating output data
 	int time_step=10;
 
