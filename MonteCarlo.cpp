@@ -117,11 +117,11 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 				E += (double) DeltaE;
 				accepted += 1;
 			}
-			average[0] = E/cycles/size/size;
-			average[1] = E2/cycles/size/size;
-			average[2] = M/cycles/size/size;
-			average[3] = M2/cycles/size/size;
-			average[4] = absM/cycles/size/size;
+			average[0] = E;
+			average[1] = E2;
+			average[2] = M;
+			average[3] = M2;
+			average[4] = absM;
 
 			Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
 		}
