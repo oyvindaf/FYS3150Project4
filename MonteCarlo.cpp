@@ -131,13 +131,17 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 }
 
 
-void read_input(int& n, int& montecarlo, double& temp) {
+void read_input(int& n, int& montecarlo, double& temp, int& iterations, double& fin_temp) {
 	cout << "number of lattices: ";
 	cin >> n;
 	cout << "number of montecarlo cycles: ";
 	cin >> montecarlo;
 	cout << "initial temperature: ";
 	cin >> temp;
+	cout << "final temperature: ";
+	cin >> fin_temp;
+	cout << "temperature iterations: "
+	cin >> iterations;
 }
 
 
