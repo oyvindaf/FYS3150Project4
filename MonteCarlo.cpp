@@ -11,6 +11,7 @@
 
 using namespace std;
 ofstream ofile;
+void initialize(int size, double& M, double& E, int** myLattice);
 void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted);
 // function for periodic boundary condition
 inline int periodic(int pos, int size, int add) {
@@ -99,7 +100,7 @@ double M2 = 0;
 double absM = 0;
 double average[5];
 for (int i = 0; i < 5; i++) average[i] = 0;
-
+initialize(size, M, E, myLattice);
 for(int cycles = 1; cycles <= montecarlo; cycles++){
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
@@ -117,15 +118,16 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 				E += (double) DeltaE;
 				accepted += 1;
 			}
-			average[0] = E;
-			average[1] = E2;
-			average[2] = M;
-			average[3] = M2;
-			average[4] = absM;
 
-			Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
 		}
 	}
+	average[0] = E;
+	average[1] = E2;
+	average[2] = M;
+	average[3] = M2;
+	average[4] = absM;
+
+	Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
 }
 }
 
@@ -144,7 +146,7 @@ void Output(int size, int cycles, double temp, double* average) {
 }
 
 void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted) {
-	double norm = 1 / ((double)(cycles));
+	double norm = 1 / ((double)(time_step*size*size));
 	double E_avg = average[0] * norm;
 	double E2_avg = average[1] * norm;
 	double M_avg = average[2] * norm;
@@ -153,8 +155,8 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
 	ofile << setprecision(8) << time_step;
-	ofile << setw(8) << setprecision(8) << " " << E_avg/size/size;
-	ofile << setw(8) << setprecision(8) << " " << M_avg/size/size;
+	ofile << setw(8) << setprecision(8) << " " << E_avg;
+	ofile << setw(8) << setprecision(8) << " " << M_avg;
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
 
@@ -199,7 +201,7 @@ int main(int argc, char* argv[]){
 
 
   //  initializing magnetization and energy;
-  initialize(n, M, E, myLattice);
+
 	Metropolis(n, montecarlo, myLattice, w, init_temp);
   // starting the montecarlo cycle
 	/*
