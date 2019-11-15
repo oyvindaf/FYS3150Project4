@@ -41,6 +41,26 @@ int** initialize_lattice(int n)
   return lattice2D;
 }
 
+int** ordered_initialize_lattice(int n)
+{
+  int lattice_value;
+  int random_number;
+
+  int** lattice2D = 0;
+  lattice2D = new int*[n];
+
+  for(int i = 0; i < n; i++)
+  {
+    lattice2D[i] = new int[n];
+    for(int j = 0; j < n; j++)
+    {
+			lattice2D[i][j] = 1;
+      }
+  }
+  return lattice2D;
+}
+
+
 int random_position(int n)
 {
   int random_pos;
@@ -61,7 +81,7 @@ void initialize(int size, double& M, double& E, int** myLattice) {
 	}
 }
 
-void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, double *w) {
+void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, double *w, int& accepted) {
 	//looping over all spins
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
@@ -75,6 +95,7 @@ void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, dou
 				myLattice[iy][ix] *= -1;
 				M += (double) 2 * myLattice[iy][ix];
 				E += (double) DeltaE;
+				accepted += 1;
 			}
 		}
 	}
@@ -94,6 +115,22 @@ void Output(int size, int cycles, double temp, double* average) {
 	ofile << setw(8) << setprecision(8) << "|M| = " << M_avg/size/size;
 }
 
+void Loop_Output(int size, int cycles, double temp, double* average, int time_step, int accepted) {
+	double norm = 1 / ((double)(cycles));
+	double E_avg = average[0] * norm;
+	double E2_avg = average[1] * norm;
+	double M_avg = average[2] * norm;
+	double M2_avg = average[3] * norm;
+	double Mabs_avg = average[4] * norm;
+
+	ofile << setiosflags(ios::showpoint | ios::uppercase);
+	ofile << setprecision(8) << time_step;
+	ofile << setw(8) << setprecision(8) << " " << E_avg/size/size;
+	ofile << setw(8) << setprecision(8) << " " << M_avg/size/size;
+	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
+}
+
+
 void read_input(int& n, int& montecarlo, double& temp) {
 	cout << "number of lattices: ";
 	cin >> n;
@@ -107,25 +144,25 @@ void read_input(int& n, int& montecarlo, double& temp) {
 int main(int argc, char* argv[]){
   srand(time(NULL)); // set random seed by using current time
   char* outfilename;
-  int **myLattice, n, montecarlo;
+  int **myLattice, n, montecarlo, accepted;
   long idum;
   double w[17], average[5], E, M, init_temp, final_temp, temp_step;
 
-  if (argc <= 1) { 
+  if (argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
-	  exit(1); 
+	  exit(1);
   }
-  else { 
-	  outfilename = argv[1]; 
-  } 
-  
+  else {
+	  outfilename = argv[1];
+  }
+
   ofile.open(outfilename);
 
   read_input(n, montecarlo, init_temp);
 
   myLattice = initialize_lattice(n);
 
-  E = 0; M = 0;
+  E = 0; M = 0; accepted = 0;
   idum = -1;
   // setting up array for possible energy changes
   for (int de = -8; de <= 8; de++) w[de+8] = 0;
@@ -138,12 +175,14 @@ int main(int argc, char* argv[]){
 
   // starting the montecarlo cycle
   for (int cycle = 1; cycle <= montecarlo; cycle++) {
-	  Metropolis(n, idum, myLattice, E, M, w);
+	  Metropolis(n, idum, myLattice, E, M, w, accepted);
 	  average[0] += E; average[1] += E*E;
 	  average[2] += M; average[3] += M*M; average[4] += fabs(M);
+		Loop_Output(n, montecarlo, init_temp, average, cycle, accepted);
   }
   //Generating output data
-  Output(n, montecarlo, init_temp, average);
+	int time_step=10;
+
   ofile.close();
 
   return 0;
