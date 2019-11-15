@@ -7,6 +7,7 @@
 #include "lib.cpp"
 #include <sstream>
 #include <string>
+#include <random>
 
 using namespace std;
 ofstream ofile;
@@ -82,17 +83,24 @@ void initialize(int size, double& M, double& E, int** myLattice) {
 }
 
 void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, double *w, int& accepted) {
+	random_device rd;
+	mt19937_64 gen(rd());
+	uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
+	uniform_int_distribution<int> RandomPosition(0, size-1);
 	//looping over all spins
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			//finding random position
-			int ix = random_position(size);
-			int iy = random_position(size);
+			int ix =(int) (RandomPosition(gen));
+			int iy = (int)(RandomPosition(gen));
 			int DeltaE = 2 * myLattice[iy][ix] *
 			(myLattice[iy][periodic(ix, size, -1)] + myLattice[periodic(iy, size, -1)][ix] +
 			myLattice[iy][periodic(ix, size, 1)] + myLattice[periodic(iy, size, 1)][ix]);
-			if (ran1(&idum) <= w[DeltaE + 8]) {
+
+			double R =  RandomNumberGenerator(gen);
+			if (R <= w[DeltaE + 8]) {
 				myLattice[iy][ix] *= -1;
+				cout << R << "..." <<  w[DeltaE + 8] << "..." << DeltaE << endl;
 				M += (double) 2 * myLattice[iy][ix];
 				E += (double) DeltaE;
 				accepted += 1;
@@ -102,7 +110,7 @@ void Metropolis(int size, long& idum, int **myLattice, double& E, double& M, dou
 }
 
 void Output(int size, int cycles, double temp, double* average) {
-	double norm = 1 / ((double)(cycles));
+	double norm = 1 / ((double)(cycles)*size*size);
 	double E_avg = average[0] * norm;
 	double E2_avg = average[1] * norm;
 	double M_avg = average[2] * norm;
