@@ -1,6 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
-
+from collections import Counter
 
 
 
@@ -12,13 +12,8 @@ def readfile(file, skip = 10):
     M_list = []
     Accepted_list = []
 
-    for i in range(skip):
-        o.readline()
 
     for line in o:
-        o.readline()
-        o.readline()
-        o.readline()
         line = line.split()
 
         Cycle_list.append(float(line[0]))
@@ -28,15 +23,19 @@ def readfile(file, skip = 10):
 
     return Cycle_list, E_list, M_list, Accepted_list
 
-def probability(energy):
+
+
 
 
 
 Cycle_list, E_list, M_list, Accepted_list = readfile("testing.txt")
 
+print(Counter(E_list))
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
 
+plt.subplot(211)
 plt.plot(Cycle_list, E_list, label = 'E / Cycles')
 plt.grid()
 plt.xlabel('Cycles')
@@ -47,6 +46,7 @@ plt.tight_layout()
 plt.savefig('plots/L2Testing1.pdf')
 plt.close()
 
+plt.subplot(212)
 plt.plot(Cycle_list, M_list, label = 'M / Cycles')
 plt.grid()
 plt.xlabel('Cycles')

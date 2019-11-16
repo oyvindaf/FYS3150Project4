@@ -91,7 +91,6 @@ void Metropolis(int size, int montecarlo, int **myLattice, double *w, double T) 
 	uniform_int_distribution<int> RandomPosition(0, size-1);
 	//looping over all spins
 
-
 double accepted = 0;
 double E = 0;
 double E2 = 0;
@@ -99,7 +98,6 @@ double M = 0;
 double M2 = 0;
 double absM = 0;
 double average[5];
-for (int i = 0; i < 5; i++) average[i] = 0;
 initialize(size, M, E, myLattice);
 for(int cycles = 1; cycles <= montecarlo; cycles++){
 	for (int y = 0; y < size; y++) {
