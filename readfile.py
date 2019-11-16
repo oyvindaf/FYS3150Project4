@@ -2,29 +2,37 @@ import sys
 import matplotlib.pyplot as plt
 
 
-o = open("testing.txt") # opens
-
-Cycle_list = []
-E_list = []
-M_list = []
-Accepted_list = []
 
 
-skip = 10
-for i in range(skip):
-    o.readline()
+def readfile(file, skip = 10):
+    o = open(file) # opens
 
-for line in o:
-    o.readline()
-    o.readline()
-    o.readline()
-    line = line.split()
+    Cycle_list = []
+    E_list = []
+    M_list = []
+    Accepted_list = []
 
-    Cycle_list.append(float(line[0]))
-    E_list.append(float(line[1]))
-    M_list.append(float(line[2]))
-    Accepted_list.append(float(line[3]))
+    for i in range(skip):
+        o.readline()
 
+    for line in o:
+        o.readline()
+        o.readline()
+        o.readline()
+        line = line.split()
+
+        Cycle_list.append(float(line[0]))
+        E_list.append(float(line[1]))
+        M_list.append(float(line[2]))
+        Accepted_list.append(float(line[3]))
+
+    return Cycle_list, E_list, M_list, Accepted_list
+
+def probability(energy):
+
+
+
+Cycle_list, E_list, M_list, Accepted_list = readfile("testing.txt")
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
