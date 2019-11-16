@@ -153,7 +153,7 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
 	ofile << setprecision(8) << time_step;
-	ofile << setw(8) << setprecision(8) << " " << E_avg;
+	ofile << setw(8) << setprecision(3) << " " << E_avg;
 	ofile << setw(8) << setprecision(8) << " " << M_avg;
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
@@ -195,23 +195,10 @@ int main(int argc, char* argv[]){
   // setting up array for possible energy changes
   for (int de = -8; de <= 8; de++) w[de+8] = 0;
   for (int de = -8; de <= 8; de += 4) w[de+8] = exp(-de / init_temp);
-  // initializing array for expectation values
 
-
-  //  initializing magnetization and energy;
 
 	Metropolis(n, montecarlo, myLattice, w, init_temp);
-  // starting the montecarlo cycle
-	/*
-  for (int cycle = 0; cycle <= montecarlo; cycle++) {
-	  Metropolis(n, idum, myLattice, E, M, w, accepted);
-	  average[0] += E; average[1] += E*E;
-	  average[2] += M; average[3] += M*M; average[4] += fabs(M);
-		Loop_Output(n, montecarlo, init_temp, average, cycle, accepted);
-  }
-	*/
-  //Generating output data
-	int time_step=10;
+
 
   ofile.close();
 
