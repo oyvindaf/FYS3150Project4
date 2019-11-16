@@ -1,9 +1,9 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import Counter
 import sys
 from itertools import groupby
+from collections import Counter
 
 
 
@@ -35,19 +35,19 @@ def readfile(file, skip = 5):
 
 Cycle_list, E_list, M_list, Accepted_list = readfile( sys.argv[1] )
 
+new_E_list = E_list[1000:]
 
-frequency_list=[len(list(group)) for key, group in groupby(E_list[1000:])]
-print(frequency_list)
-E_range = np.linspace(np.min(E_list),np.max(E_list),len(frequency_list))
+plt.rc('text', usetex=True)
+plt.rc('font', family='Computer Modern', size=15)
 
-
-plt.plot(E_range,frequency_list)
+plt.hist(new_E_list, bins = 300, normed = True)
+plt.xlabel('Energy')
+plt.ylabel('P(E)')
+plt.title('Probability distribution of energy states')
 plt.tight_layout()
 plt.savefig('testingtesting.pdf')
 plt.close()
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='Computer Modern', size=15)
 
 plt.subplot(211)
 plt.plot(Cycle_list, E_list, label = 'E / Cycles')
@@ -72,8 +72,8 @@ plt.close()
 plt.plot(Cycle_list, Accepted_list, label = 'Accepted / Cycles')
 plt.grid()
 plt.xlabel('Cycles')
-plt.ylabel('Energy')
-plt.title('Plot of energy versus cycles for L = 20')
+plt.ylabel('Acceptance')
+plt.title('Plot of accepted states versus cycles for L = 20')
 plt.legend()
 plt.tight_layout()
 plt.savefig('plots/L2Testing2.pdf')
