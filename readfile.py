@@ -4,7 +4,7 @@ from collections import Counter
 
 
 
-def readfile(file, skip = 10):
+def readfile(file, skip = 5):
     o = open(file) # opens
 
     Cycle_list = []
@@ -12,6 +12,8 @@ def readfile(file, skip = 10):
     M_list = []
     Accepted_list = []
 
+    for i in range(skip):
+        o.readline()
 
     for line in o:
         line = line.split()
@@ -43,8 +45,6 @@ plt.ylabel('Energy')
 plt.title('Plot of energy versus cycles for L = 2')
 plt.legend()
 plt.tight_layout()
-plt.savefig('plots/L2Testing1.pdf')
-plt.close()
 
 plt.subplot(212)
 plt.plot(Cycle_list, M_list, label = 'M / Cycles')
@@ -54,7 +54,7 @@ plt.ylabel('Magnetization')
 plt.title('Plot of magnetization versus cycles for L = 2')
 plt.legend()
 plt.tight_layout()
-plt.savefig('plots/L2Testing2.pdf')
+plt.savefig('plots/L2Testing1.pdf')
 plt.close()
 
 plt.plot(Cycle_list, Accepted_list, label = 'Accepted / Cycles')
@@ -64,5 +64,5 @@ plt.ylabel('Energy')
 plt.title('Plot of energy versus cycles for L = 2')
 plt.legend()
 plt.tight_layout()
-plt.savefig('plots/L2Testing3.pdf')
+plt.savefig('plots/L2Testing2.pdf')
 plt.close()
