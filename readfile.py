@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
 import sys
+from itertools import groupby
 
 
 
@@ -34,11 +35,13 @@ def readfile(file, skip = 5):
 
 Cycle_list, E_list, M_list, Accepted_list = readfile( sys.argv[1] )
 
-dict = Counter(E_list[400:])
 
-lists = sorted(dict.items())
-E, P = zip(*lists)
-plt.plot(E,P)
+frequency_list=[len(list(group)) for key, group in groupby(E_list[1000:])]
+print(frequency_list)
+E_range = np.linspace(np.min(E_list),np.max(E_list),len(frequency_list))
+
+
+plt.plot(E_range,frequency_list)
 plt.tight_layout()
 plt.savefig('testingtesting.pdf')
 plt.close()
