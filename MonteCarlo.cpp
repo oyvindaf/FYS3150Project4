@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
-//#include <armadillo>
-//#include <cstdlib>
 #include <iomanip>
 #include "lib.cpp"
 #include <sstream>
@@ -100,6 +98,13 @@ double absM = 0;
 double average[5];
 initialize(size, M, E, myLattice);
 for(int cycles = 1; cycles <= montecarlo; cycles++){
+	if (cycles%10000 == 0){
+		cout << "E: " << E << endl;
+		cout << "<E>: " << average[0] << endl;
+//		cout << "dE: " << DeltaE << endl;
+		cout << "M: " << M << endl;
+		cout << "Cycle: " << cycles <<endl;
+	}
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			//finding random position
@@ -117,13 +122,14 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 				accepted += 1;
 			}
 
+
 		}
 	}
-	average[0] = E;
-	average[1] = E2;
-	average[2] = M;
-	average[3] = M2;
-	average[4] = absM;
+	average[0] += E;
+	average[1] += E2;
+	average[2] += M;
+	average[3] += M2;
+	average[4] += absM;
 
 	Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
 }
@@ -190,7 +196,9 @@ int main(int argc, char* argv[]){
 
   myLattice = initialize_lattice(n);
 
-  E = 0; M = 0; accepted = 0;
+  E = 0;
+	M = 0;
+	accepted = 0;
   idum = -1;
   // setting up array for possible energy changes
   for (int de = -8; de <= 8; de++) w[de+8] = 0;

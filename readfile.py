@@ -2,12 +2,13 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import matplotlib.font_manager
 from itertools import groupby
 from collections import Counter
 
 
 
-def readfile(file, skip = 5):
+def readfile(file, skip = 100):
     o = open(file) # opens
 
     Cycle_list = []
@@ -40,7 +41,7 @@ new_E_list = E_list[1000:]
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
 
-plt.hist(new_E_list, bins = 300, normed = True)
+plt.hist(new_E_list, bins = 30, density = True)
 plt.xlabel('Energy')
 plt.ylabel('P(E)')
 plt.title('Probability distribution of energy states')
