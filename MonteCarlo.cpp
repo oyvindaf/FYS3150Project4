@@ -1,3 +1,4 @@
+#include "mpi.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -11,6 +12,8 @@ using namespace std;
 ofstream ofile;
 void initialize(int size, double& M, double& E, int** myLattice);
 void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted);
+void Output_done(int size, int cycles, double temp, double* average);
+
 // function for periodic boundary condition
 inline int periodic(int pos, int size, int add) {
 	return (pos + size + add) % (size);
@@ -61,7 +64,6 @@ int** ordered_initialize_lattice(int n)
   return lattice2D;
 }
 
-
 int random_position(int n)
 {
   int random_pos;
@@ -82,23 +84,24 @@ void initialize(int size, double& M, double& E, int** myLattice) {
 	}
 }
 
-void Metropolis(int size, int montecarlo, int **myLattice, double *w, double T) {
+void Metropolis(int size, int montecarlo, int **myLattice, double *w, double T, int loop, int loop_start, int loop_end, int my_rank) {
 	random_device rd;
 	mt19937_64 gen(rd());
 	uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
 	uniform_int_distribution<int> RandomPosition(0, size-1);
 	//looping over all spins
 
-double accepted = 0;
-double E = 0;
-double E2 = 0;
-double M = 0;
-double M2 = 0;
-double absM = 0;
-double average[5];
-initialize(size, M, E, myLattice);
-for(int cycles = 1; cycles <= montecarlo; cycles++){
-	M = 0;
+ double accepted = 0;
+ double E = 0;
+ double M = 0;
+ double absM = 0;
+ double average[5];
+ double tot_average[5];
+ for (int i = 0; i < 5; i++) average[i] = 0;
+ for (int i = 0; i < 5; i++) tot_average[i] = 0;
+ initialize(size, M, E, myLattice);
+
+ for(int cycles = loop_start; cycles <= loop_end; cycles++){
 	if (cycles == 0){
 		cout << "E: " << E << endl;
 		cout << "<E>: " << average[0] << endl;
@@ -118,7 +121,6 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 			if (R <= w[DeltaE + 8]) {
 				myLattice[iy][ix] *= -1;
 				M += (double) 2 * myLattice[iy][ix];
-				absM = sqrt(M*M);
 				E += (double) DeltaE;
 				accepted += 1;
 			}
@@ -126,17 +128,27 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 
 		}
 	}
+	absM = sqrt(M * M);
 	average[0] += E;
-	average[1] += E2;
+	average[1] += E * E;
 	average[2] += M;
-	average[3] += M2;
-	average[4] += absM;
-
-	Loop_Output(size, montecarlo, T, average, cycles, accepted/size/size/(double)(cycles) );
+	average[3] += M * M; //M2;
+	average[4] += fabs(M);
+	if (loop == 1) {
+		Loop_Output(size, montecarlo, T, average, cycles, accepted / size / size / (double)(cycles));
+	}
+ }
+ 
+ for (int i = 0; i < 5; i++) {
+	 MPI_reduce(&average[i], &tot_average[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+ }
+ 
+ if ((loop == 0) && (my_rank == 0)) {
+	Output_done(size, montecarlo, T, tot_average);
+ }
 }
-}
 
-void Output(int size, int cycles, double temp, double* average) {
+void Output_done(int size, int cycles, double temp, double* average) {
 	double norm = 1 / ((double)(cycles)*size*size);
 	double E_avg = average[0] * norm;
 	double E2_avg = average[1] * norm;
@@ -144,10 +156,16 @@ void Output(int size, int cycles, double temp, double* average) {
 	double M2_avg = average[3] * norm;
 	double Mabs_avg = average[4] * norm;
 
+	double E_var = (E2_avg - E_avg * E_avg);
+	double M_var = (M2_avg - M_avg * M_avg);
+
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
-	ofile << setprecision(8) << "T = " << temp;
-	ofile << setw(8) << setprecision(8) << "|E| = " << E_avg/size/size;
-	ofile << setw(8) << setprecision(8) << "|M| = " << M_avg/size/size;
+	ofile << setprecision(8) << temp;
+	ofile << setw(8) << setprecision(8) << " " << E_avg;
+	ofile << setw(8) << setprecision(8) << " " << E_var/(temp*temp);
+	//ofile << setw(8) << setprecision(8) << " " << M_avg;
+	ofile << setw(8) << setprecision(8) << " " << Mabs_avg;
+	ofile << setw(8) << setprecision(8) << " " << M_var/temp << endl;
 }
 
 void Loop_Output(int size, int cycles, double temp, double* average, int time_step, double accepted) {
@@ -165,33 +183,16 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
 
-void Loop_Metropolis_Output(int size, int cycles, double temp, double* average, double dT, double time_step){
-	double norm = 1 / ((double)(time_step*size*size));
-	double E_avg = average[0] * norm;
-	double E2_avg = average[1] * norm;
-	double M_avg = average[2] * norm;
-	double M2_avg = average[3] * norm;
-	double Mabs_avg = average[4] * norm;
+void Loop_Metropolis(double init_temp, double final_temp, double dT, int size, int montecarlo, int **myLattice, double *w, int loop, int loop_start, int loop_end, int my_rank){
+	for (double temp = init_temp; temp <= final_temp; temp+=dT){
+		for (int de = -8; de <= 8; de++) w[de + 8] = 0;
+		for (int de = -8; de <= 8; de += 4) w[de + 8] = exp(-de / temp);
 
-	ofile << setiosflags(ios::showpoint | ios::uppercase);
-	ofile << setprecision(8) << time_step;
-	ofile << setw(8) << setprecision(3) << " " << E_avg;
-	ofile << setw(8) << setprecision(8) << " " << Mabs_avg;
-}
-
-void Loop_Metropolis(double init_temp, double final_temp, double dT, int size, int montecarlo, int **myLattice, double *w){
-	int n;
-	double L;
-	double T = init_temp;
-	L = final_temp - init_temp;
-	n = (int)(L/dT);
-	for (int i = 0; i < n; i++){
-		Metropolis(size, montecarlo, myLattice, w, T);
-		T += dT;
+		Metropolis(size, montecarlo, myLattice, w, temp, loop, loop_start, loop_end, my_rank);
 	}
 }
 
-void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, string& initial_state) {
+void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, string& initial_state, int& loop) {
 	cout << "number of lattices: ";
 	cin >> n;
 	cout << "number of montecarlo cycles: ";
@@ -204,30 +205,45 @@ void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& d
 	cin >> dT;
 	cout << "ordered or disordered: ";
 	cin >> initial_state;
+	cout << "looped output or final output, 1 is looped, 0 is final: ";
+	cin >> loop;
 }
 
 
 int main(int argc, char* argv[]){
   srand(time(NULL)); // set random seed by using current time
   char* outfilename;
-  int **myLattice, n, montecarlo, accepted;
+  int **myLattice, n, montecarlo, accepted, loop, my_rank, numprocs;
   long idum;
-  double w[17], average[5], E, M, init_temp, final_temp, temp_step;
-	string initial_state;
-	string ordered;
-	string disordered;
+  double w[17], average[5], tot_average[5], E, M, init_temp, final_temp, temp_step;
+  string initial_state;
+  string ordered;
+  string disordered;
 
-  if (argc <= 1) {
+  MPI_init(&argc, &argv);
+  MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+  if (my_rank == 1 && argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
 	  exit(1);
   }
-  else {
+  if (my_rank == 0 && argc > 1) {
 	  outfilename = argv[1];
+	  ofile.open(outfilename);
   }
 
-  ofile.open(outfilename);
+  read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state, loop);
 
-  read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state);
+  int intervals_proc = montecarlo / numprocs;
+  int loop_start = my_rank * intervals_proc + 1;
+  int loop_end = (my_rank + 1) * intervals_proc;
+  if ((my_rank == numprocs - 1) && (loop_end < montecarlo)) loop_end = mcs;
+
+  MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD); 
+  MPI_Bcast(&init_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD); 
+  MPI_Bcast(&final_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD); 
+  MPI_Bcast(&temp_step, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 	if (initial_state == ordered){
 		myLattice = ordered_initialize_lattice(n);
@@ -237,16 +253,19 @@ int main(int argc, char* argv[]){
 
 
   E = 0;
-	M = 0;
-	accepted = 0;
-  idum = -1;
+  M = 0;
+  accepted = 0;
+  idum = -1-my_rank;
   // setting up array for possible energy changes
   for (int de = -8; de <= 8; de++) w[de+8] = 0;
   for (int de = -8; de <= 8; de += 4) w[de+8] = exp(-de / init_temp);
 
-
-	Metropolis(n, montecarlo, myLattice, w, init_temp);
-//	Loop_Metropolis(init_temp, final_temp, dT, n, )
+  if (loop == 1) {
+	  Metropolis(n, montecarlo, myLattice, w, init_temp, loop, loop_start, loop_end, my_rank);
+  }
+  else {
+	  Loop_Metropolis(init_temp, final_temp, temp_step, n, montecarlo, myLattice, w, loop, loop_start, loop_end, my_rank);
+  }
 
   ofile.close();
 
