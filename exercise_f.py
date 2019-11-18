@@ -36,10 +36,10 @@ plt.rc('font', family='Computer Modern', size=15)
 
 
 
-plt.plot(temperature, C_v[0:C_v.size/4], 'b', label = 'L = 40')
+plt.plot(temperature, C_v[:C_v.size/4], 'b', label = 'L = 40')
 plt.plot(temperature, C_v[C_v.size/4:C_v.size/2],'g', label = 'L = 60')
 plt.plot(temperature, C_v[C_v.size/2:3*C_v.size/4], 'k', label = 'L = 80')
-plt.plot(temperature, C_v[3*C_v.size/4:C_v.size], 'r', label = 'L = 100')
+plt.plot(temperature, C_v[3*C_v.size/4:], 'r', label = 'L = 100')
 plt.title("Plot of heat capacity versus temperature for various Lattice sizes")
 plt.xlabel("Temperature")
 plt.ylabel("$C_v$")
