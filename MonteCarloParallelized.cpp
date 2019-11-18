@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <random>
+#include <ctime>
 
 using namespace std;
 ofstream ofile;
@@ -192,25 +193,12 @@ void Loop_Metropolis(double init_temp, double final_temp, double dT, int size, i
 	}
 }
 
-void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, string& initial_state, int& loop) {
-	cout << "number of lattices: ";
-	cin >> n;
-	cout << "number of montecarlo cycles: ";
-	cin >> montecarlo;
-	cout << "initial temperature: ";
-	cin >> temp1;
-	cout << "final temperature: ";
-	cin >> temp2;
-	cout << "temperature step size: ";
-	cin >> dT;
-	cout << "ordered or disordered: ";
-	cin >> initial_state;
-	cout << "looped output or final output, 1 is looped, 0 is final: ";
-	cin >> loop;
-}
-
-
 int main(int argc, char* argv[]){
+
+	clock_t start;
+	double duration;
+
+
   srand(time(NULL)); // set random seed by using current time
   char* outfilename;
   int **myLattice, n, montecarlo, accepted, loop, my_rank, numprocs;
@@ -222,6 +210,7 @@ int main(int argc, char* argv[]){
 
   //read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state, loop);
 
+	start = clock();
 
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
@@ -236,11 +225,11 @@ int main(int argc, char* argv[]){
 	  ofile.open(outfilename);
   }
 
-	n = 40;
+	n = 100;
 	montecarlo = 100000;
-	init_temp = 2.0;
-	final_temp = 2.3;
-	temp_step = 0.05;
+	init_temp = 2.1;
+	final_temp = 2.4;
+	temp_step = 0.005;
 	initial_state = disordered;
 	loop = 0;
 
@@ -277,6 +266,9 @@ int main(int argc, char* argv[]){
   }
 
   ofile.close();
+
+	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+	cout << "runtime:" << duration << '\n';
 
   return 0;
 }

@@ -43,7 +43,7 @@ plt.close()
 
 plt.plot(temperature, M_abs_list)
 plt.xlabel("Temperature")
-plt.ylabel("$ \langle |M| \rangle $")
+plt.ylabel("$ Expectation value of |M| $")
 plt.title("Plot of absolute magnetization versus temperature")
 plt.grid()
 plt.tight_layout()
