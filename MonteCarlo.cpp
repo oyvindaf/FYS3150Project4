@@ -138,11 +138,11 @@ void Metropolis(int size, int montecarlo, int **myLattice, double *w, double T, 
 		Loop_Output(size, montecarlo, T, average, cycles, accepted / size / size / (double)(cycles));
 	}
  }
- 
+
  for (int i = 0; i < 5; i++) {
-	 MPI_reduce(&average[i], &tot_average[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	 MPI_Reduce(&average[i], &tot_average[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
  }
- 
+
  if ((loop == 0) && (my_rank == 0)) {
 	Output_done(size, montecarlo, T, tot_average);
  }
@@ -220,11 +220,14 @@ int main(int argc, char* argv[]){
   string ordered;
   string disordered;
 
-  MPI_init(&argc, &argv);
+  //read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state, loop);
+
+
+  MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  if (my_rank == 1 && argc <= 1) {
+  if (my_rank == 0 && argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
 	  exit(1);
   }
@@ -233,16 +236,22 @@ int main(int argc, char* argv[]){
 	  ofile.open(outfilename);
   }
 
-  read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state, loop);
+	n = 40;
+	montecarlo = 100000;
+	init_temp = 2.0;
+	final_temp = 2.3;
+	temp_step = 0.05;
+	initial_state = disordered;
+	loop = 0;
 
   int intervals_proc = montecarlo / numprocs;
   int loop_start = my_rank * intervals_proc + 1;
   int loop_end = (my_rank + 1) * intervals_proc;
-  if ((my_rank == numprocs - 1) && (loop_end < montecarlo)) loop_end = mcs;
+  if ((my_rank == numprocs - 1) && (loop_end < montecarlo)) loop_end = montecarlo;
 
-  MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD); 
-  MPI_Bcast(&init_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD); 
-  MPI_Bcast(&final_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD); 
+  MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&init_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&final_temp, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&temp_step, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 	if (initial_state == ordered){
