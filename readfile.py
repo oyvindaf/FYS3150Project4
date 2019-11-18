@@ -8,7 +8,7 @@ from collections import Counter
 
 
 
-def readfile(file, skip = 100):
+def readfile(file, skip = 0):
     o = open(file) # opens
 
     Cycle_list = []
@@ -41,7 +41,7 @@ new_E_list = E_list[1000:]
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
 
-plt.hist(new_E_list, bins = 30, density = True)
+plt.hist(new_E_list, density = True)
 plt.xlabel('Energy')
 plt.ylabel('P(E)')
 plt.title('Probability distribution of energy states')
@@ -49,9 +49,16 @@ plt.tight_layout()
 plt.savefig('testingtesting.pdf')
 plt.close()
 
+plt.plot(new_E_list)
+plt.xlabel('Energy')
+plt.ylabel('P(E)')
+plt.title('Probability distribution of energy states')
+plt.tight_layout()
+plt.savefig('testingtesting2.pdf')
+plt.close()
 
 plt.subplot(211)
-plt.plot(Cycle_list, E_list, label = 'E / Cycles')
+plt.semilogx(Cycle_list, E_list, label = 'E / Cycles')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Energy')
@@ -60,7 +67,7 @@ plt.legend()
 plt.tight_layout()
 
 plt.subplot(212)
-plt.plot(Cycle_list, M_list, label = 'M / Cycles')
+plt.semilogx(Cycle_list, M_list, label = 'M / Cycles')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Magnetization')
@@ -70,7 +77,7 @@ plt.tight_layout()
 plt.savefig('plots/L2Testing1.pdf')
 plt.close()
 
-plt.plot(Cycle_list, Accepted_list, label = 'Accepted / Cycles')
+plt.semilogx(Cycle_list, Accepted_list, label = 'Accepted / Cycles')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Acceptance')

@@ -98,11 +98,11 @@ double absM = 0;
 double average[5];
 initialize(size, M, E, myLattice);
 for(int cycles = 1; cycles <= montecarlo; cycles++){
-	if (cycles%10000 == 0){
+	M = 0;
+	if (cycles == 0){
 		cout << "E: " << E << endl;
 		cout << "<E>: " << average[0] << endl;
-//		cout << "dE: " << DeltaE << endl;
-		cout << "M: " << M << endl;
+		cout << "abs M: " << sqrt(M*M) << endl;
 		cout << "Cycle: " << cycles <<endl;
 	}
 	for (int y = 0; y < size; y++) {
@@ -118,6 +118,7 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 			if (R <= w[DeltaE + 8]) {
 				myLattice[iy][ix] *= -1;
 				M += (double) 2 * myLattice[iy][ix];
+				absM = sqrt(M*M);
 				E += (double) DeltaE;
 				accepted += 1;
 			}
@@ -131,7 +132,7 @@ for(int cycles = 1; cycles <= montecarlo; cycles++){
 	average[3] += M2;
 	average[4] += absM;
 
-	Loop_Output(size, montecarlo,T, average, cycles, accepted/size/size/(double)(cycles) );
+	Loop_Output(size, montecarlo, T, average, cycles, accepted/size/size/(double)(cycles) );
 }
 }
 
@@ -160,7 +161,7 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
 	ofile << setprecision(8) << time_step;
 	ofile << setw(8) << setprecision(3) << " " << E_avg;
-	ofile << setw(8) << setprecision(8) << " " << M_avg;
+	ofile << setw(8) << setprecision(8) << " " << Mabs_avg;
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
 
