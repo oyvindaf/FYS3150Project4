@@ -36,7 +36,7 @@ def readfile(file, skip = 0):
 
 Cycle_list, E_list, M_list, Accepted_list = readfile( sys.argv[1] )
 
-new_E_list = E_list[1000:]
+new_E_list = E_list[10000:]
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)

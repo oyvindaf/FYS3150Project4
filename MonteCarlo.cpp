@@ -55,7 +55,7 @@ int** ordered_initialize_lattice(int n)
     lattice2D[i] = new int[n];
     for(int j = 0; j < n; j++)
     {
-			lattice2D[i][j] = 1;
+			lattice2D[i][j] = -1;
       }
   }
   return lattice2D;
@@ -165,14 +165,43 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
 
+void Loop_Metropolis_Output(int size, int cycles, double temp, double* average, double dT, double time_step){
+	double norm = 1 / ((double)(time_step*size*size));
+	double E_avg = average[0] * norm;
+	double E2_avg = average[1] * norm;
+	double M_avg = average[2] * norm;
+	double M2_avg = average[3] * norm;
+	double Mabs_avg = average[4] * norm;
 
-void read_input(int& n, int& montecarlo, double& temp, string& initial_state) {
+	ofile << setiosflags(ios::showpoint | ios::uppercase);
+	ofile << setprecision(8) << time_step;
+	ofile << setw(8) << setprecision(3) << " " << E_avg;
+	ofile << setw(8) << setprecision(8) << " " << Mabs_avg;
+}
+
+void Loop_Metropolis(double init_temp, double final_temp, double dT, int size, int montecarlo, int **myLattice, double *w){
+	int n;
+	double L;
+	double T = init_temp;
+	L = final_temp - init_temp;
+	n = (int)(L/dT);
+	for (int i = 0; i < n; i++){
+		Metropolis(size, montecarlo, myLattice, w, T);
+		T += dT;
+	}
+}
+
+void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, string& initial_state) {
 	cout << "number of lattices: ";
 	cin >> n;
 	cout << "number of montecarlo cycles: ";
 	cin >> montecarlo;
 	cout << "initial temperature: ";
-	cin >> temp;
+	cin >> temp1;
+	cout << "final temperature: ";
+	cin >> temp2;
+	cout << "temperature step size: ";
+	cin >> dT;
 	cout << "ordered or disordered: ";
 	cin >> initial_state;
 }
@@ -198,12 +227,12 @@ int main(int argc, char* argv[]){
 
   ofile.open(outfilename);
 
-  read_input(n, montecarlo, init_temp, initial_state);
+  read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state);
 
 	if (initial_state == ordered){
-		myLattice = initialize_lattice(n);
-	} else{
 		myLattice = ordered_initialize_lattice(n);
+	} else{
+		myLattice = initialize_lattice(n);
 	}
 
 
@@ -217,7 +246,7 @@ int main(int argc, char* argv[]){
 
 
 	Metropolis(n, montecarlo, myLattice, w, init_temp);
-
+//	Loop_Metropolis(init_temp, final_temp, dT, n, )
 
   ofile.close();
 
