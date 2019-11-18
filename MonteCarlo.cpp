@@ -166,13 +166,15 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 }
 
 
-void read_input(int& n, int& montecarlo, double& temp) {
+void read_input(int& n, int& montecarlo, double& temp, string& initial_state) {
 	cout << "number of lattices: ";
 	cin >> n;
 	cout << "number of montecarlo cycles: ";
 	cin >> montecarlo;
 	cout << "initial temperature: ";
 	cin >> temp;
+	cout << "ordered or disordered: ";
+	cin >> initial_state;
 }
 
 
@@ -182,6 +184,9 @@ int main(int argc, char* argv[]){
   int **myLattice, n, montecarlo, accepted;
   long idum;
   double w[17], average[5], E, M, init_temp, final_temp, temp_step;
+	string initial_state;
+	string ordered;
+	string disordered;
 
   if (argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
@@ -193,9 +198,14 @@ int main(int argc, char* argv[]){
 
   ofile.open(outfilename);
 
-  read_input(n, montecarlo, init_temp);
+  read_input(n, montecarlo, init_temp, initial_state);
 
-  myLattice = initialize_lattice(n);
+	if (initial_state == ordered){
+		myLattice = initialize_lattice(n);
+	} else{
+		myLattice = ordered_initialize_lattice(n);
+	}
+
 
   E = 0;
 	M = 0;
