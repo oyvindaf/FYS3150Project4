@@ -160,7 +160,7 @@ void Loop_Output(int size, int cycles, double temp, double* average, int time_st
 
 	ofile << setiosflags(ios::showpoint | ios::uppercase);
 	ofile << setprecision(8) << time_step;
-	ofile << setw(8) << setprecision(3) << " " << E_avg;
+	ofile << setw(8) << setprecision(8) << " " << E_avg;
 	ofile << setw(8) << setprecision(8) << " " << Mabs_avg;
 	ofile << setw(8) << setprecision(8) << " " << accepted << endl;
 }
