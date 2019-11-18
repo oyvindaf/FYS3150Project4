@@ -38,10 +38,14 @@ Cycle_list, E_list, M_list, Accepted_list = readfile( sys.argv[1] )
 
 new_E_list = E_list[10000:]
 
+energies, frequencies = np.unique(new_E_list, return_counts = True)
+
+probability = energies/np.sum(energies)
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
 
-plt.hist(new_E_list, density = True)
+plt.bar(frequencies, energies)
 plt.xlabel('Energy')
 plt.ylabel('P(E)')
 plt.title('Probability distribution of energy states')
@@ -86,3 +90,5 @@ plt.legend()
 plt.tight_layout()
 plt.savefig('plots/L2Testing2.pdf')
 plt.close()
+
+print(np.std(new_E_list))
