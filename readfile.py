@@ -35,60 +35,70 @@ def readfile(file, skip = 0):
 
 
 Cycle_list, E_list, M_list, Accepted_list = readfile( sys.argv[1] )
+Cycle_list2, E_list2, M_list2, Accepted_list2 = readfile(sys.argv[2])
 
-new_E_list = E_list[10000:]
+# new_E_list = E_list[10000:]
+# new_E_list2 = E_list2[10000:]
+# new_M_list = M_list[10000:]
+# new_M_list2 = M_list2[10000:]
+# Cycle_list = Cycle_list[10000:]
+# Cycle_list2 = Cycle_list
 
-energies, frequencies = np.unique(new_E_list, return_counts = True)
 
-probability = energies/np.sum(energies)
+# energies, frequencies = np.unique(new_E_list, return_counts = True)
+#
+# probability = energies/np.sum(energies)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='Computer Modern', size=15)
 
-plt.bar(frequencies, energies)
-plt.xlabel('Energy')
-plt.ylabel('P(E)')
-plt.title('Probability distribution of energy states')
-plt.tight_layout()
-plt.savefig('testingtesting.pdf')
-plt.close()
+# plt.bar(frequencies, energies)
+# plt.xlabel('Energy')
+# plt.ylabel('P(E)')
+# plt.title('Probability distribution of energy states')
+# plt.tight_layout()
+# plt.savefig('testingtesting.pdf')
+# plt.close()
 
-plt.plot(new_E_list)
-plt.xlabel('Energy')
-plt.ylabel('P(E)')
-plt.title('Probability distribution of energy states')
-plt.tight_layout()
-plt.savefig('testingtesting2.pdf')
-plt.close()
+# plt.plot(new_E_list)
+# plt.xlabel('Energy')
+# plt.ylabel('P(E)')
+# plt.title('Probability distribution of energy states')
+# plt.tight_layout()
+# plt.savefig('testingtesting2.pdf')
+# plt.close()
 
-plt.subplot(211)
-plt.semilogx(Cycle_list, E_list, label = 'E / Cycles')
+#plt.subplot(211)
+plt.semilogx(Cycle_list, E_list, label = 'Disordered')
+plt.semilogx(Cycle_list2, E_list2, label = 'Ordered')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Energy')
-plt.title('Plot of energy versus cycles for L = 20')
+plt.title('Energy for T = 2.4')
 plt.legend()
 plt.tight_layout()
+plt.savefig('ferdig_resultater/2C_energyT24.pdf')
+plt.close()
 
-plt.subplot(212)
-plt.semilogx(Cycle_list, M_list, label = 'M / Cycles')
+# plt.subplot(212)
+plt.semilogx(Cycle_list, M_list, label = 'Disordered')
+plt.semilogx(Cycle_list2, M_list2, label = 'Ordered')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Magnetization')
-plt.title('Plot of magnetization versus cycles for L = 20')
+plt.title('Magnetization for T = 2.4')
 plt.legend()
 plt.tight_layout()
-plt.savefig('plots/L2Testing1.pdf')
+plt.savefig('ferdig_resultater/2C_magnetizationT24.pdf')
 plt.close()
 
-plt.semilogx(Cycle_list, Accepted_list, label = 'Accepted / Cycles')
+plt.semilogx(Cycle_list, Accepted_list, label = 'Ordered')
+plt.semilogx(Cycle_list2, Accepted_list2, label = 'Disordered')
 plt.grid()
 plt.xlabel('Cycles')
 plt.ylabel('Acceptance')
-plt.title('Plot of accepted states versus cycles for L = 20')
+plt.title('Plot of accepted states versus cycles for T = 2.4')
 plt.legend()
 plt.tight_layout()
-plt.savefig('plots/L2Testing2.pdf')
+plt.savefig('ferdig_resultater/2C_acceptedT24.pdf')
 plt.close()
-
-print(np.std(new_E_list))

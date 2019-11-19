@@ -183,7 +183,7 @@ void Loop_Metropolis(double init_temp, double final_temp, double dT, int size, i
 	}
 }
 
-void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, string& initial_state, int& loop) {
+void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& dT, int& initial_state, int& loop) {
 	cout << "number of lattices: ";
 	cin >> n;
 	cout << "number of montecarlo cycles: ";
@@ -194,7 +194,7 @@ void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& d
 	cin >> temp2;
 	cout << "temperature step size: ";
 	cin >> dT;
-	cout << "ordered or disordered: ";
+	cout << "ordered or disordered, 1 is ordered 0 is disordered: ";
 	cin >> initial_state;
 	cout << "looped output or final output, 1 is looped, 0 is final: ";
 	cin >> loop;
@@ -207,9 +207,9 @@ int main(int argc, char* argv[]){
   int **myLattice, n, montecarlo, accepted, loop;
   long idum;
   double w[17], average[5], E, M, init_temp, final_temp, temp_step;
-  string initial_state;
-  string ordered;
-  string disordered;
+  int initial_state;
+  int ordered;
+  int disordered;
 
   if (argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
@@ -223,11 +223,12 @@ int main(int argc, char* argv[]){
 
   read_input(n, montecarlo, init_temp, final_temp, temp_step, initial_state, loop);
 
-	if (initial_state == ordered){
-		myLattice = ordered_initialize_lattice(n);
-	} else{
-		myLattice = initialize_lattice(n);
-	}
+	// if (initial_state = 1){
+	// 	myLattice = ordered_initialize_lattice(n);
+	// } else{
+	// 	myLattice = initialize_lattice(n);
+	// }
+	myLattice = initialize_lattice(n);
 
 
   E = 0;
