@@ -202,6 +202,10 @@ void read_input(int& n, int& montecarlo, double& temp1, double& temp2, double& d
 
 
 int main(int argc, char* argv[]){
+
+	clock_t start;
+	double duration;
+
   srand(time(NULL)); // set random seed by using current time
   char* outfilename;
   int **myLattice, n, montecarlo, accepted, loop;
@@ -210,6 +214,8 @@ int main(int argc, char* argv[]){
   int initial_state;
   int ordered;
   int disordered;
+
+	start = clock();
 
   if (argc <= 1) {
 	  cout << "Bad Usage: " << argv[0] << " read also output file on same line" << endl;
@@ -247,6 +253,9 @@ int main(int argc, char* argv[]){
   }
 
   ofile.close();
+
+	duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+	cout << "runtime:" << duration << '\n';
 
   return 0;
 }
