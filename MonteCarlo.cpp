@@ -228,7 +228,7 @@ int main(int argc, char* argv[]){
 	// } else{
 	// 	myLattice = initialize_lattice(n);
 	// }
-	myLattice = ordered_initialize_lattice(n);
+	myLattice = initialize_lattice(n);
 
 
   E = 0;
