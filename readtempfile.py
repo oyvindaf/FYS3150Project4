@@ -7,7 +7,7 @@ from itertools import groupby
 from collections import Counter
 
 def readfile(file):
-    o = open(file) # opens
+     # opens
 
     temperature = []
     E_list = []
@@ -16,6 +16,7 @@ def readfile(file):
     M_abs_list = []
     ksi_list = []
 
+    o = open(file)
     for line in o:
         line = line.split()
 
@@ -24,7 +25,7 @@ def readfile(file):
         C_v.append(float(line[2]))
         M_abs_list.append(float(line[3]))
         ksi_list.append(float(line[4]))
-
+    o.close()
     return temperature, E_list, C_v, M_abs_list, ksi_list
 
 temperature, E_list, C_v, M_abs_list, ksi_list = readfile(sys.argv[1])
