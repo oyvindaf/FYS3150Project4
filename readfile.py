@@ -80,7 +80,7 @@ plt.tight_layout()
 plt.savefig('ferdig_resultater/2C_energyT24.pdf')
 plt.close()
 
-plt.subplot(212)
+# plt.subplot(212)
 plt.semilogx(Cycle_list, M_list, label = 'Disordered')
 plt.semilogx(Cycle_list2, M_list2, label = 'Ordered')
 plt.grid()
